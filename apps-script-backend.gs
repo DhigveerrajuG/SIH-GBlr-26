@@ -1,4 +1,4 @@
-const SHARED_SECRET = "sih2026-change-this-secret";
+const SHARED_SECRET = "sih2026-internal-EClub";
 
 const COOLDOWN_SECONDS = 10 * 60;
 
@@ -41,7 +41,7 @@ function doPost(e) {
     const ticketId = 'SIH-' + String(ticketNum).padStart(4, '0');
 
     sheet.appendRow([
-      new Date(), ticketId, data.teamName || '', data.teamNo || '', data.category || '',
+      new Date(), ticketId, data.teamName || '', data.tableNumber || '', data.category || '',
       data.subject || '', data.issue || '', data.venue || '', 'Pending', '', new Date(), ''
     ]);
 
