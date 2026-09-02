@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin — SIH Helpdesk</title>
+<title>Admin — SIH Support Desk</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://script.google.com/macros/s/AKfycbw3Dg0oUPQBY0F79k4MorMIoVwu-tjJSMksZiE53-AyGEp4efAIxZPdXtupuN92Hpbtjw/exec" rel="stylesheet">
 <style>
@@ -47,20 +47,20 @@
 
   /* Dashboard */
   #dashboard{ display:none; max-width: 1000px; margin: 0 auto; padding: 28px 18px 60px; }
-  .topbar{ display:flex; align-items:center; justify-content:space-between; margin-bottom: 22px; flex-wrap:wrap; gap:12px; }
-  .topbar h1{ font-family:'Space Grotesk', sans-serif; font-size: 24px; margin:0; }
-  .topbar .eyebrow{
+  .top-bar{ display:flex; align-items:center; justify-content:space-between; margin-bottom: 22px; flex-wrap:wrap; gap:12px; }
+  .top-bar h1{ font-family:'Space Grotesk', sans-serif; font-size: 24px; margin:0; }
+  .top-bar .eyebrow{
     font-family:'JetBrains Mono', monospace; font-size: 11px; letter-spacing:0.12em; color: var(--amber);
     text-transform: uppercase; margin-bottom:4px; display:flex; align-items:center; gap:6px;
   }
-  .topbar .eyebrow::before{ content:""; width:6px; height:6px; border-radius:50%; background:var(--teal); box-shadow:0 0 6px var(--teal); }
+  .top-bar .eyebrow::before{ content:""; width:6px; height:6px; border-radius:50%; background:var(--teal); box-shadow:0 0 6px var(--teal); }
   .whoami{ font-family:'JetBrains Mono', monospace; font-size: 12px; color: var(--ink-dim); margin-top:3px; }
   .whoami b{ color: var(--ink); }
   .role-badge{
     font-size: 10px; text-transform: uppercase; letter-spacing:0.05em; padding: 2px 8px; border-radius:100px;
     border: 1px solid rgba(245,165,36,0.4); color: var(--amber); margin-left: 6px;
   }
-  .topbar-actions{ display:flex; gap:10px; }
+  .top-bar-actions{ display:flex; gap:10px; }
   .icon-btn{
     background: var(--card); border:1px solid var(--card-edge); color: var(--ink-dim);
     font-family:'JetBrains Mono', monospace; font-size:12px; padding: 9px 14px; border-radius: 9px; cursor:pointer;
@@ -190,7 +190,7 @@
 <div id="loginScreen">
   <div class="login-card">
     <h1>Admin access</h1>
-    <p>Enter your personal admin key to open the SIH helpdesk dashboard.</p>
+    <p>Enter your personal admin key to open the SIH support dashboard.</p>
     <label for="adminKey">Admin key</label>
     <input type="password" id="adminKey" placeholder="Your admin key" autocomplete="off">
     <button id="loginBtn">Unlock dashboard</button>
@@ -200,13 +200,13 @@
 
 <!-- Dashboard -->
 <div id="dashboard">
-  <div class="topbar">
+  <div class="top-bar">
     <div>
-      <div class="eyebrow">Live · SIH helpdesk</div>
+      <div class="eyebrow">Live · SIH help desk</div>
       <h1>Complaint dashboard</h1>
       <div class="whoami">Logged in as <b id="whoamiName"></b><span class="role-badge" id="whoamiRole"></span></div>
     </div>
-    <div class="topbar-actions">
+    <div class="top-bar-actions">
       <button class="icon-btn owner-only" id="manageAdminsBtn">Manage admins</button>
       <button class="icon-btn" id="refreshBtn">↻ Refresh</button>
       <button class="icon-btn" id="logoutBtn">Log out</button>
@@ -379,7 +379,7 @@
 
     let filtered = complaints.filter(c => {
       const statusMatch = currentFilter === 'all' || (c.status || '').toLowerCase() === currentFilter;
-      const searchMatch = !q || [c.teamName, c.tablenumber, c.ticketId, c.venue, c.subject]
+      const searchMatch = !q || [c.teamName, c.tableNumber, c.ticketId, c.venue, c.subject]
         .join(' ').toLowerCase().includes(q);
       return statusMatch && searchMatch;
     });
@@ -394,7 +394,7 @@
         <span class="t-id">${c.ticketId}</span>
         <div class="t-main">
           <div class="t-subject">${escapeHtml(c.subject)}</div>
-          <div class="t-meta">${escapeHtml(c.teamName)} (${escapeHtml(c.tablenumber)}) · ${escapeHtml(c.category)} · ${escapeHtml(c.venue)}</div>
+          <div class="t-meta">${escapeHtml(c.teamName)} (${escapeHtml(c.tableNumber)}) · ${escapeHtml(c.category)} · ${escapeHtml(c.venue)}</div>
         </div>
         <span class="t-pill ${(c.status||'').toLowerCase()}">${c.status || 'Pending'}</span>
       </div>
@@ -419,7 +419,7 @@
 
     document.getElementById('mTicketId').textContent = c.ticketId;
     document.getElementById('mSubject').textContent = c.subject;
-    document.getElementById('mTeam').innerHTML = `Team <b>${escapeHtml(c.teamName)}</b> · ${escapeHtml(c.tablenumber)}`;
+    document.getElementById('mTeam').innerHTML = `Team <b>${escapeHtml(c.teamName)}</b> · ${escapeHtml(c.tableNumber)}`;
     document.getElementById('mCategory').textContent = c.category;
     document.getElementById('mVenue').textContent = c.venue;
     document.getElementById('mTime').textContent = `Submitted: ${c.timestamp}`;

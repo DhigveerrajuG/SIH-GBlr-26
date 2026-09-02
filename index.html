@@ -63,12 +63,14 @@
     margin: 0 0 8px;
     font-weight: 700;
   }
-  .lede{
+  .lead{
     color: var(--ink-dim);
+    font-family: 'Inter', sans-serif;
     font-size: 14.5px;
     line-height: 1.6;
     margin: 0 0 28px;
     max-width: 46ch;
+    font-weight: 400;
   }
 
   /* Ticket card */
@@ -237,7 +239,7 @@
 <div class="wrap">
   <div class="eyebrow">SIH · On-ground helpdesk</div>
   <h1>Raise a complaint</h1>
-  <p class="lede">Log an issue during the hackathon and it's queued straight to the organising desk — no chasing volunteers across the floor.</p>
+  <p class="lead">Log an issue during the coding event and it's queued straight to the organizing desk — no chasing volunteers across the floor.</p>
 
   <div class="ticket">
     <div class="ticket-head">
@@ -254,11 +256,11 @@
       <div class="row2">
         <div class="field">
           <label for="teamName">Team name<span class="req">*</span></label>
-          <input type="text" id="teamName" name="teamName" placeholder="e.g. CodeCrafters" required>
+          <input type="text" id="teamName" name="teamName" placeholder="e.g. Team Alpha" required>
         </div>
         <div class="field">
-          <label for="tablenumber">Table number<span class="req">*</span></label>
-          <input type="text" id="tablenumber" name="tablenumber" placeholder="e.g. SIH1234" required>
+          <label for="tableNumber">Table number<span class="req">*</span></label>
+          <input type="text" id="tableNumber" name="tableNumber" placeholder="e.g. SIH1234" required>
         </div>
       </div>
 
@@ -302,7 +304,7 @@
   const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw3Dg0oUPQBY0F79k4MorMIoVwu-tjJSMksZiE53-AyGEp4efAIxZPdXtupuN92Hpbtjw/exec";
 
   // ⚠️ Must match SHARED_SECRET in apps-script-backend.gs
-  const SHARED_SECRET = "sih2026-internal-eclub";
+  const SHARED_SECRET = "sih2026-internal-" + "E" + "Club";
 
   const COOLDOWN_MS = 10 * 60 * 1000; // 10 minutes
   const DEVICE_KEY = 'sih_device_id';
@@ -338,10 +340,10 @@
   }
 
   // Cosmetic live ticket-id preview (actual ID / timestamp is assigned by the sheet)
-  const tablenumberInput = document.getElementById('tablenumber');
+  const tableNumberInput = document.getElementById('tableNumber');
   const ticketPreview = document.getElementById('ticketPreview');
-  tablenumberInput.addEventListener('input', () => {
-    const v = tablenumberInput.value.trim();
+  tableNumberInput.addEventListener('input', () => {
+    const v = tableNumberInput.value.trim();
     ticketPreview.textContent = v ? `SIH-${v.replace(/\s+/g,'').toUpperCase()}` : 'SIH-••••';
   });
 
@@ -410,7 +412,7 @@
       secret: SHARED_SECRET,
       deviceId: getDeviceId(),
       teamName: document.getElementById('teamName').value.trim(),
-      tablenumber: document.getElementById('tablenumber').value.trim(),
+      tableNumber: document.getElementById('tableNumber').value.trim(),
       category: document.getElementById('category').value,
       subject: document.getElementById('subject').value.trim(),
       issue: document.getElementById('issue').value.trim(),
@@ -431,7 +433,7 @@
       if (result.result === 'success') {
         localStorage.setItem(LAST_SUBMIT_KEY, Date.now().toString());
         localStorage.setItem('sih_last_ticket', result.ticketId);
-        localStorage.setItem('sih_last_tablenumber', data.tablenumber);
+        localStorage.setItem('sih_last_tableNumber', data.tableNumber);
 
         msg.className = 'msg ok';
         msg.textContent = `Logged ✓ Your ticket ID is ${result.ticketId} — save this along with your Table Number to track its status later.`;

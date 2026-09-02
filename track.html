@@ -54,9 +54,14 @@
     font-size: clamp(28px, 5vw, 36px);
     line-height: 1.15; margin: 0 0 8px; font-weight: 700;
   }
-  .lede{ color: var(--ink-dim); font-size: 14.5px; line-height: 1.6; margin: 0 0 28px; max-width: 46ch; }
-  .backlink{ color: var(--ink-dim); font-size: 13px; text-decoration:none; }
-  .backlink:hover{ color: var(--amber); }
+  .intro{ color: var(--ink-dim); font-size: 14.5px; line-height: 1.6; margin: 0 0 28px; max-width: 46ch; }
+  .back-link{
+    color: var(--ink-dim);
+    font-size: 13px;
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+  .back-link:hover{ color: var(--amber); }
 
   .card{
     background: var(--card);
@@ -167,8 +172,8 @@
 <div class="wrap">
   <div class="eyebrow">SIH · On-ground helpdesk</div>
   <h1>Track your complaint</h1>
-  <p class="lede">Enter your Ticket ID and Team Number to check the current status.</p>
-  <a class="backlink" href="index.html">← Back to complaint form</a>
+  <p class="intro">Enter your Ticket ID and Team Number to check the current status.</p>
+  <a class="back-link" href="index.html">← Back to complaint form</a>
 
   <div class="card">
     <form id="trackForm">
