@@ -236,7 +236,7 @@
   // Pre-fill from the last successful submission on this device, if any
   window.addEventListener('DOMContentLoaded', () => {
     const lastTicket = localStorage.getItem('sih_last_ticket');
-    const lastTeamNo = localStorage.getItem('sih_last_teamno');
+    const lastTeamNo = localStorage.getItem('sih_last_teamNo');
     if (lastTicket) document.getElementById('ticketId').value = lastTicket;
     if (lastTeamNo) document.getElementById('teamNo').value = lastTeamNo;
   });
