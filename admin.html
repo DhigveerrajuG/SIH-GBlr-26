@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — SIH Helpdesk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://script.google.com/macros/s/AKfycbw3Dg0oUPQBY0F79k4MorMIoVwu-tjJSMksZiE53-AyGEp4efAIxZPdXtupuN92Hpbtjw/exec" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0B0F1A; --bg-grid: #131a2b; --card: #121826; --card-edge: #1E2740;
+    --ink: #EDEFF5; --ink-dim: #8A93A8; --amber: #F5A524; --teal: #2DD4BF;
+    --danger: #F16565; --radius: 14px;
+  }
+  *{ box-sizing: border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    min-height:100vh;
+    background:
+      repeating-linear-gradient(0deg, var(--bg-grid) 0px, var(--bg-grid) 1px, transparent 1px, transparent 32px),
+      repeating-linear-gradient(90deg, var(--bg-grid) 0px, var(--bg-grid) 1px, transparent 1px, transparent 32px),
+      var(--bg);
+    color: var(--ink);
+    font-family: 'Inter', sans-serif;
+  }
+
+  /* Login */
+  #loginScreen{ min-height:100vh; display:flex; align-items:center; justify-content:center; padding:20px; }
+  .login-card{
+    background: var(--card); border: 1px solid var(--card-edge); border-radius: var(--radius);
+    padding: 28px; width:100%; max-width: 360px; box-shadow: 0 30px 60px -30px rgba(0,0,0,0.7);
+  }
+  .login-card h1{ font-family:'Space Grotesk', sans-serif; font-size: 22px; margin: 0 0 6px; }
+  .login-card p{ color: var(--ink-dim); font-size: 13.5px; margin: 0 0 20px; }
+  .login-card input{
+    width:100%; background:#0D1220; border:1px solid var(--card-edge); color:var(--ink);
+    font-family:'JetBrains Mono', monospace; font-size: 14px; padding: 12px 13px; border-radius: 9px;
+    outline:none; margin-bottom: 14px;
+  }
+  .login-card input:focus{ border-color: var(--amber); }
+  .login-card button{
+    width:100%; background: var(--amber); color:#241503; font-family:'Space Grotesk', sans-serif;
+    font-weight:700; font-size:14.5px; border:none; padding: 12px; border-radius: 9px; cursor:pointer;
+  }
+  .login-card button:hover{ background:#ffb541; }
+  .login-err{ color: var(--danger); font-size: 12.5px; margin-top: 10px; font-family:'JetBrains Mono', monospace; display:none; }
+
+  /* Dashboard */
+  #dashboard{ display:none; max-width: 1000px; margin: 0 auto; padding: 28px 18px 60px; }
+  .topbar{ display:flex; align-items:center; justify-content:space-between; margin-bottom: 22px; flex-wrap:wrap; gap:12px; }
+  .topbar h1{ font-family:'Space Grotesk', sans-serif; font-size: 24px; margin:0; }
+  .topbar .eyebrow{
+    font-family:'JetBrains Mono', monospace; font-size: 11px; letter-spacing:0.12em; color: var(--amber);
+    text-transform: uppercase; margin-bottom:4px; display:flex; align-items:center; gap:6px;
+  }
+  .topbar .eyebrow::before{ content:""; width:6px; height:6px; border-radius:50%; background:var(--teal); box-shadow:0 0 6px var(--teal); }
+  .whoami{ font-family:'JetBrains Mono', monospace; font-size: 12px; color: var(--ink-dim); margin-top:3px; }
+  .whoami b{ color: var(--ink); }
+  .role-badge{
+    font-size: 10px; text-transform: uppercase; letter-spacing:0.05em; padding: 2px 8px; border-radius:100px;
+    border: 1px solid rgba(245,165,36,0.4); color: var(--amber); margin-left: 6px;
+  }
+  .topbar-actions{ display:flex; gap:10px; }
+  .icon-btn{
+    background: var(--card); border:1px solid var(--card-edge); color: var(--ink-dim);
+    font-family:'JetBrains Mono', monospace; font-size:12px; padding: 9px 14px; border-radius: 9px; cursor:pointer;
+  }
+  .icon-btn:hover{ color: var(--ink); border-color: var(--amber); }
+  .icon-btn.owner-only{ display:none; }
+
+  .filters{ display:flex; gap:8px; margin-bottom: 18px; flex-wrap:wrap; }
+  .filter-btn{
+    background: var(--card); border: 1px solid var(--card-edge); color: var(--ink-dim);
+    font-family:'JetBrains Mono', monospace; font-size: 12px; padding: 8px 14px; border-radius: 100px; cursor:pointer;
+  }
+  .filter-btn.active{ border-color: var(--amber); color: var(--amber); background: rgba(245,165,36,0.08); }
+
+  .search input{
+    width:100%; background: var(--card); border:1px solid var(--card-edge); color: var(--ink);
+    font-family:'Inter', sans-serif; font-size: 13.5px; padding: 11px 14px; border-radius: 9px; outline:none;
+    margin-bottom: 18px;
+  }
+  .search input:focus{ border-color: var(--amber); }
+
+  .list{ display:flex; flex-direction:column; gap:10px; }
+  .empty{ color: var(--ink-dim); font-size: 13.5px; padding: 30px 0; text-align:center; font-family:'JetBrains Mono', monospace; }
+
+  .ticket-row{
+    background: var(--card); border: 1px solid var(--card-edge); border-radius: 12px;
+    padding: 14px 16px; cursor:pointer; transition: border-color .15s ease;
+    display:flex; align-items:center; gap:14px; flex-wrap:wrap;
+  }
+  .ticket-row:hover{ border-color: var(--amber); }
+  .t-id{ font-family:'JetBrains Mono', monospace; font-size: 12.5px; color: var(--amber); min-width: 76px; }
+  .t-main{ flex:1; min-width: 180px; }
+  .t-subject{ font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+  .t-meta{ font-size: 12px; color: var(--ink-dim); }
+  .t-pill{
+    font-family:'JetBrains Mono', monospace; font-size: 11px; letter-spacing:0.05em; text-transform:uppercase;
+    padding: 5px 12px; border-radius:100px; font-weight:600; white-space:nowrap;
+  }
+  .t-pill.pending{ background: rgba(139,148,168,0.12); border:1px solid rgba(139,148,168,0.35); color: var(--ink-dim); }
+  .t-pill.ongoing{ background: rgba(245,165,36,0.1); border:1px solid rgba(245,165,36,0.4); color: var(--amber); }
+  .t-pill.solved{ background: rgba(45,212,191,0.1); border:1px solid rgba(45,212,191,0.4); color: var(--teal); }
+
+  /* Modals (shared backdrop style) */
+  .backdrop{
+    display:none; position:fixed; inset:0; background: rgba(5,7,13,0.7); backdrop-filter: blur(3px);
+    align-items:center; justify-content:center; padding: 20px; z-index: 50;
+  }
+  .modal{
+    background: var(--card); border: 1px solid var(--card-edge); border-radius: var(--radius);
+    width:100%; max-width: 480px; max-height: 88vh; overflow-y:auto;
+    box-shadow: 0 30px 60px -20px rgba(0,0,0,0.8);
+  }
+  .modal-head{ padding: 20px 22px 14px; border-bottom: 1px solid var(--card-edge); }
+  .modal-head .t-id{ margin-bottom:6px; display:block; }
+  .modal-head h2{ font-family:'Space Grotesk', sans-serif; font-size: 19px; margin:0 0 6px; }
+  .modal-body{ padding: 18px 22px; }
+  .kv{ font-size: 13px; color: var(--ink-dim); margin-bottom: 4px; }
+  .kv b{ color: var(--ink); font-weight:500; }
+  .issue-box{
+    margin-top: 14px; background:#0D1220; border:1px solid var(--card-edge); border-radius:9px;
+    padding: 13px; font-size: 13.5px; line-height:1.6; color: var(--ink);
+  }
+  .modal-body label{
+    display:block; font-size: 12px; font-weight:600; color: var(--ink-dim); margin: 18px 0 7px;
+    text-transform:uppercase; letter-spacing:0.04em; font-family:'JetBrains Mono', monospace;
+  }
+  .modal-body textarea, .modal-body input[type=text]{
+    width:100%; background:#0D1220; border:1px solid var(--card-edge); color:var(--ink);
+    font-family:'Inter', sans-serif; font-size: 13.5px; padding: 11px; border-radius:9px;
+    outline:none; resize:vertical;
+  }
+  .modal-body textarea{ min-height: 80px; }
+  .modal-body textarea:focus, .modal-body input:focus{ border-color: var(--amber); }
+  .status-buttons{ display:flex; gap:8px; margin-top:8px; }
+  .status-buttons button{
+    flex:1; padding: 10px; border-radius: 8px; border:1px solid var(--card-edge); background:#0D1220;
+    color: var(--ink-dim); font-family:'JetBrains Mono', monospace; font-size:11.5px; text-transform:uppercase;
+    cursor:pointer; letter-spacing:0.04em;
+  }
+  .status-buttons button.selected.pending{ border-color: var(--ink-dim); color: var(--ink); }
+  .status-buttons button.selected.ongoing{ border-color: var(--amber); color: var(--amber); background: rgba(245,165,36,0.08); }
+  .status-buttons button.selected.solved{ border-color: var(--teal); color: var(--teal); background: rgba(45,212,191,0.08); }
+
+  .modal-actions{ display:flex; gap:10px; margin-top:20px; }
+  .save-btn{
+    flex:1; background: var(--amber); color:#241503; font-family:'Space Grotesk', sans-serif; font-weight:700;
+    font-size:14px; border:none; padding: 12px; border-radius:9px; cursor:pointer;
+  }
+  .save-btn:hover{ background:#ffb541; }
+  .save-btn:disabled{ opacity:0.6; cursor:progress; }
+  .close-btn{
+    background: none; border: 1px solid var(--card-edge); color: var(--ink-dim); font-family:'Inter', sans-serif;
+    font-size: 14px; padding: 12px 16px; border-radius:9px; cursor:pointer;
+  }
+  .save-msg{ font-family:'JetBrains Mono', monospace; font-size:12px; color: var(--teal); margin-top:10px; display:none; }
+  .handled-by{ font-size: 12px; color: var(--ink-dim); margin-top: 10px; font-family:'JetBrains Mono', monospace; }
+
+  /* Manage Admins modal */
+  .admin-list{ display:flex; flex-direction:column; gap:8px; margin-top: 4px; }
+  .admin-row{
+    display:flex; align-items:center; gap:10px; background:#0D1220; border:1px solid var(--card-edge);
+    border-radius: 9px; padding: 10px 12px;
+  }
+  .admin-row .name{ flex:1; font-size: 13.5px; }
+  .admin-row .name .role{ font-size:11px; color: var(--ink-dim); margin-left:6px; }
+  .admin-row .key{ font-family:'JetBrains Mono', monospace; font-size: 11.5px; color: var(--ink-dim); }
+  .admin-row.inactive{ opacity: 0.5; }
+  .mini-btn{
+    background:none; border:1px solid var(--card-edge); color: var(--ink-dim); font-family:'JetBrains Mono', monospace;
+    font-size: 10.5px; padding: 5px 9px; border-radius: 6px; cursor:pointer; text-transform: uppercase;
+  }
+  .mini-btn.danger{ color: var(--danger); border-color: rgba(241,101,101,0.4); }
+  .mini-btn.go{ color: var(--teal); border-color: rgba(45,212,191,0.4); }
+  .new-key-box{
+    display:none; margin-top: 16px; background: rgba(45,212,191,0.08); border: 1px solid rgba(45,212,191,0.35);
+    border-radius: 9px; padding: 14px; font-size: 13px; line-height: 1.6;
+  }
+  .new-key-box code{
+    display:block; margin-top:8px; font-family:'JetBrains Mono', monospace; font-size: 14px; color: var(--teal);
+    background:#0D1220; padding: 8px 10px; border-radius:6px; word-break: break-all;
+  }
+</style>
+</head>
+<body>
+
+<!-- Login -->
+<div id="loginScreen">
+  <div class="login-card">
+    <h1>Admin access</h1>
+    <p>Enter your personal admin key to open the SIH helpdesk dashboard.</p>
+    <label for="adminKey">Admin key</label>
+    <input type="password" id="adminKey" placeholder="Your admin key" autocomplete="off">
+    <button id="loginBtn">Unlock dashboard</button>
+    <div class="login-err" id="loginErr">Incorrect key, or your access has been revoked.</div>
+  </div>
+</div>
+
+<!-- Dashboard -->
+<div id="dashboard">
+  <div class="topbar">
+    <div>
+      <div class="eyebrow">Live · SIH helpdesk</div>
+      <h1>Complaint dashboard</h1>
+      <div class="whoami">Logged in as <b id="whoamiName"></b><span class="role-badge" id="whoamiRole"></span></div>
+    </div>
+    <div class="topbar-actions">
+      <button class="icon-btn owner-only" id="manageAdminsBtn">Manage admins</button>
+      <button class="icon-btn" id="refreshBtn">↻ Refresh</button>
+      <button class="icon-btn" id="logoutBtn">Log out</button>
+    </div>
+  </div>
+
+  <div class="filters" id="filters">
+    <button class="filter-btn active" data-filter="all">All</button>
+    <button class="filter-btn" data-filter="pending">Pending</button>
+    <button class="filter-btn" data-filter="ongoing">Ongoing</button>
+    <button class="filter-btn" data-filter="solved">Solved</button>
+  </div>
+
+  <div class="search">
+    <label for="searchInput" class="sr-only">Search complaints</label>
+    <input type="text" id="searchInput" placeholder="Search by team name, team no, ticket ID, or venue…">
+  </div>
+
+  <div class="list" id="list">
+    <div class="empty">Loading complaints…</div>
+  </div>
+</div>
+
+<!-- Ticket detail modal -->
+<div class="backdrop" id="modalBackdrop">
+  <div class="modal">
+    <div class="modal-head">
+      <span class="t-id" id="mTicketId"></span>
+      <h2 id="mSubject" aria-label="Ticket subject">Ticket Subject</h2>
+      <div class="kv" id="mTeam"></div>
+    </div>
+    <div class="modal-body">
+      <div class="kv"><b id="mCategory"></b> · <span id="mVenue"></span></div>
+      <div class="kv" id="mTime"></div>
+      <div class="issue-box" id="mIssue"></div>
+
+      <label for="statusButtons">Status</label>
+      <div class="status-buttons" id="statusButtons">
+        <button data-status="Pending">Pending</button>
+        <button data-status="Ongoing">Ongoing</button>
+        <button data-status="Solved">Solved</button>
+      </div>
+
+      <label for="mRemarks">Remarks (visible to the team)</label>
+      <textarea id="mRemarks" placeholder="e.g. Router replaced, connectivity restored."></textarea>
+      <div class="handled-by" id="mHandledBy"></div>
+
+      <div class="modal-actions">
+        <button class="save-btn" id="saveBtn">Save changes</button>
+        <button class="close-btn" id="closeBtn">Close</button>
+      </div>
+      <div class="save-msg" id="saveMsg">Saved ✓</div>
+    </div>
+  </div>
+</div>
+
+<!-- Manage admins modal (Owner only) -->
+<div class="backdrop" id="adminsBackdrop">
+  <div class="modal">
+    <div class="modal-head">
+      <h2>Manage admins</h2>
+      <div class="kv">Only you (Owner) can add or revoke admin access.</div>
+    </div>
+    <div class="modal-body">
+      <label for="newAdminName">Add a new admin</label>
+      <input type="text" id="newAdminName" placeholder="Full name of the person you're adding">
+      <div class="modal-actions">
+        <button class="save-btn" id="addAdminBtn">Generate access key</button>
+        <button class="close-btn" id="closeAdminsBtn">Close</button>
+      </div>
+      <div class="new-key-box" id="newKeyBox">
+        Share this key privately with <b id="newKeyName"></b> — they'll paste it into the admin login screen. This key won't be shown again.
+        <code id="newKeyValue"></code>
+      </div>
+
+      <label for="adminList" style="margin-top:26px;">Current admins</label>
+      <section class="admin-list" id="adminList" aria-label="Current admins"></section>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  // ⚠️ Replace this with your deployed Google Apps Script Web App URL
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw3Dg0oUPQBY0F79k4MorMIoVwu-tjJSMksZiE53-AyGEp4efAIxZPdXtupuN92Hpbtjw/exec";
+
+  let MY_KEY = sessionStorage.getItem('sih_admin_key') || '';
+  let ME = { name: '', role: '' };
+  let complaints = [];
+  let currentFilter = 'all';
+  let activeTicket = null;
+  let selectedStatus = null;
+
+  const loginScreen = document.getElementById('loginScreen');
+  const dashboard = document.getElementById('dashboard');
+
+  // ---------- Login ----------
+  async function tryLogin(key) {
+    if (SCRIPT_URL.includes('PASTE_YOUR')) {
+      showLoginError('Setup needed: add your Google Apps Script Web App URL in admin.html (SCRIPT_URL).');
+      return;
+    }
+    const res = await fetch(`${SCRIPT_URL}?action=adminLogin&key=${encodeURIComponent(key)}`);
+    const data = await res.json();
+    if (!data.valid) {
+      showLoginError('Incorrect key, or your access has been revoked.');
+      sessionStorage.removeItem('sih_admin_key');
+      return;
+    }
+    MY_KEY = key;
+    ME = { name: data.name, role: data.role };
+    sessionStorage.setItem('sih_admin_key', key);
+
+    document.getElementById('whoamiName').textContent = ME.name;
+    document.getElementById('whoamiRole').textContent = ME.role;
+    if (ME.role === 'Owner') {
+      document.getElementById('manageAdminsBtn').style.display = 'inline-block';
+    }
+
+    loginScreen.style.display = 'none';
+    dashboard.style.display = 'block';
+    await refreshList();
+  }
+
+  function showLoginError(text) {
+    const el = document.getElementById('loginErr');
+    el.textContent = text;
+    el.style.display = 'block';
+  }
+
+  document.getElementById('loginBtn').addEventListener('click', () => {
+    const key = document.getElementById('adminKey').value.trim();
+    if (key) tryLogin(key);
+  });
+  document.getElementById('adminKey').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') document.getElementById('loginBtn').click();
+  });
+
+  if (MY_KEY) await tryLogin(MY_KEY);
+
+  document.getElementById('logoutBtn').addEventListener('click', () => {
+    sessionStorage.removeItem('sih_admin_key');
+    location.reload();
+  });
+
+  // ---------- List + filters ----------
+  async function refreshList() {
+    const res = await fetch(`${SCRIPT_URL}?action=list&key=${encodeURIComponent(MY_KEY)}`);
+    const data = await res.json();
+    if (!data.error) {
+      complaints = data.complaints || [];
+      renderList();
+    }
+  }
+  document.getElementById('refreshBtn').addEventListener('click', refreshList);
+  setInterval(refreshList, 30000);
+
+  document.querySelectorAll('.filter-btn').forEach(b => {
+    b.addEventListener('click', () => {
+      document.querySelectorAll('.filter-btn').forEach(x => x.classList.remove('active'));
+      b.classList.add('active');
+      currentFilter = b.dataset.filter;
+      renderList();
+    });
+  });
+  document.getElementById('searchInput').addEventListener('input', renderList);
+
+  function renderList() {
+    const list = document.getElementById('list');
+    const q = document.getElementById('searchInput').value.trim().toLowerCase();
+
+    let filtered = complaints.filter(c => {
+      const statusMatch = currentFilter === 'all' || (c.status || '').toLowerCase() === currentFilter;
+      const searchMatch = !q || [c.teamName, c.teamNo, c.ticketId, c.venue, c.subject]
+        .join(' ').toLowerCase().includes(q);
+      return statusMatch && searchMatch;
+    });
+
+    if (filtered.length === 0) {
+      list.innerHTML = '<div class="empty">No complaints match this view.</div>';
+      return;
+    }
+
+    list.innerHTML = filtered.map(c => `
+      <div class="ticket-row" data-ticket="${c.ticketId}">
+        <span class="t-id">${c.ticketId}</span>
+        <div class="t-main">
+          <div class="t-subject">${escapeHtml(c.subject)}</div>
+          <div class="t-meta">${escapeHtml(c.teamName)} (${escapeHtml(c.teamNo)}) · ${escapeHtml(c.category)} · ${escapeHtml(c.venue)}</div>
+        </div>
+        <span class="t-pill ${(c.status||'').toLowerCase()}">${c.status || 'Pending'}</span>
+      </div>
+    `).join('');
+
+    list.querySelectorAll('.ticket-row').forEach(row => {
+      row.addEventListener('click', () => openTicket(row.dataset.ticket));
+    });
+  }
+
+  function escapeHtml(s) {
+    return (s || '').toString().replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+  }
+
+  // ---------- Ticket detail modal ----------
+  const modalBackdrop = document.getElementById('modalBackdrop');
+
+  async function openTicket(ticketId) {
+    const c = complaints.find(x => x.ticketId === ticketId);
+    if (!c) return;
+    activeTicket = c;
+
+    document.getElementById('mTicketId').textContent = c.ticketId;
+    document.getElementById('mSubject').textContent = c.subject;
+    document.getElementById('mTeam').innerHTML = `Team <b>${escapeHtml(c.teamName)}</b> · ${escapeHtml(c.teamNo)}`;
+    document.getElementById('mCategory').textContent = c.category;
+    document.getElementById('mVenue').textContent = c.venue;
+    document.getElementById('mTime').textContent = `Submitted: ${c.timestamp}`;
+    document.getElementById('mIssue').textContent = c.issue;
+    document.getElementById('mRemarks').value = c.remarks || '';
+    document.getElementById('mHandledBy').textContent = c.handledBy ? `Last handled by: ${c.handledBy}` : '';
+    document.getElementById('saveMsg').style.display = 'none';
+
+    selectedStatus = c.status || 'Pending';
+    setStatusButtons(selectedStatus);
+
+    modalBackdrop.style.display = 'flex';
+
+    // Auto-flip Pending → Ongoing the moment an admin opens it
+    if ((c.status || 'Pending').toLowerCase() === 'pending') {
+      selectedStatus = 'Ongoing';
+      setStatusButtons('Ongoing');
+      document.getElementById('mHandledBy').textContent = `Last handled by: ${ME.name}`;
+      await updateTicket(c.ticketId, 'Ongoing', c.remarks || '', true);
+    }
+  }
+
+  function setStatusButtons(status) {
+    document.querySelectorAll('#statusButtons button').forEach(b => {
+      b.classList.remove('selected', 'pending', 'ongoing', 'solved');
+      if (b.dataset.status === status) b.classList.add('selected', status.toLowerCase());
+    });
+  }
+
+  document.querySelectorAll('#statusButtons button').forEach(b => {
+    b.addEventListener('click', () => {
+      selectedStatus = b.dataset.status;
+      setStatusButtons(selectedStatus);
+    });
+  });
+
+  document.getElementById('closeBtn').addEventListener('click', () => {
+    modalBackdrop.style.display = 'none';
+    refreshList();
+  });
+
+  document.getElementById('saveBtn').addEventListener('click', async () => {
+    const remarks = document.getElementById('mRemarks').value.trim();
+    const btn = document.getElementById('saveBtn');
+    btn.disabled = true;
+    btn.textContent = 'Saving…';
+    await updateTicket(activeTicket.ticketId, selectedStatus, remarks, false);
+    btn.disabled = false;
+    btn.textContent = 'Save changes';
+    document.getElementById('mHandledBy').textContent = `Last handled by: ${ME.name}`;
+    const saveMsg = document.getElementById('saveMsg');
+    saveMsg.style.display = 'block';
+    setTimeout(() => saveMsg.style.display = 'none', 2000);
+  });
+
+  async function updateTicket(ticketId, status, remarks, silent) {
+    const url = `${SCRIPT_URL}?action=update&key=${encodeURIComponent(MY_KEY)}`
+      + `&ticketId=${encodeURIComponent(ticketId)}`
+      + `&status=${encodeURIComponent(status)}`
+      + `&remarks=${encodeURIComponent(remarks)}`;
+    await fetch(url);
+    const c = complaints.find(x => x.ticketId === ticketId);
+    if (c) { c.status = status; c.remarks = remarks; c.handledBy = ME.name; }
+    if (!silent) renderList();
+  }
+
+  // ---------- Manage Admins (Owner only) ----------
+  const adminsBackdrop = document.getElementById('adminsBackdrop');
+
+  document.getElementById('manageAdminsBtn').addEventListener('click', async () => {
+    document.getElementById('newKeyBox').style.display = 'none';
+    document.getElementById('newAdminName').value = '';
+    adminsBackdrop.style.display = 'flex';
+    await loadAdmins();
+  });
+  document.getElementById('closeAdminsBtn').addEventListener('click', () => {
+    adminsBackdrop.style.display = 'none';
+  });
+
+  async function loadAdmins() {
+    const res = await fetch(`${SCRIPT_URL}?action=listAdmins&key=${encodeURIComponent(MY_KEY)}`);
+    const data = await res.json();
+    const list = document.getElementById('adminList');
+    if (data.error || !data.admins) {
+      list.innerHTML = '<div class="empty">Could not load admins.</div>';
+      return;
+    }
+    list.innerHTML = data.admins.map(a => {
+      const buttonClass = a.active ? 'danger' : 'go';
+      const buttonText = a.active ? 'Revoke' : 'Restore';
+      const adminButton = a.role !== 'Owner' ? `<button class="mini-btn ${buttonClass}" data-key="${a.key}" data-active="${a.active}">${buttonText}</button>` : '';
+      return `
+      <div class="admin-row ${a.active ? '' : 'inactive'}">
+        <div class="name">${escapeHtml(a.name)}<span class="role">${a.role}${a.active ? '' : ' · revoked'}</span></div>
+        <div class="key">${a.maskedKey}</div>
+        ${adminButton}
+      </div>
+    `;
+    }).join('');
+
+    list.querySelectorAll('.mini-btn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const targetKey = btn.dataset.key;
+        const currentlyActive = btn.dataset.active === 'true';
+        await fetch(`${SCRIPT_URL}?action=setAdminActive&key=${encodeURIComponent(MY_KEY)}&targetKey=${encodeURIComponent(targetKey)}&active=${!currentlyActive}`);
+        await loadAdmins();
+      });
+    });
+  }
+
+  document.getElementById('addAdminBtn').addEventListener('click', async () => {
+    const name = document.getElementById('newAdminName').value.trim();
+    if (!name) return;
+    const btn = document.getElementById('addAdminBtn');
+    btn.disabled = true;
+    btn.textContent = 'Generating…';
+
+    const res = await fetch(`${SCRIPT_URL}?action=addAdmin&key=${encodeURIComponent(MY_KEY)}&newName=${encodeURIComponent(name)}`);
+    const data = await res.json();
+
+    btn.disabled = false;
+    btn.textContent = 'Generate access key';
+
+    if (data.result === 'success') {
+      document.getElementById('newKeyName').textContent = data.name;
+      document.getElementById('newKeyValue').textContent = data.key;
+      document.getElementById('newKeyBox').style.display = 'block';
+      document.getElementById('newAdminName').value = '';
+      await loadAdmins();
+    }
+  });
+</script>
+</body>
+</html>

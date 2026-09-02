@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SIH Helpdesk — Raise a Complaint</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://script.google.com/macros/s/AKfycbw3Dg0oUPQBY0F79k4MorMIoVwu-tjJSMksZiE53-AyGEp4efAIxZPdXtupuN92Hpbtjw/exec" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0B0F1A;
+    --bg-grid: #131a2b;
+    --card: #121826;
+    --card-edge: #1E2740;
+    --ink: #EDEFF5;
+    --ink-dim: #8A93A8;
+    --amber: #F5A524;
+    --amber-dim: #7a5417;
+    --teal: #2DD4BF;
+    --danger: #F16565;
+    --radius: 14px;
+  }
+  *{ box-sizing: border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    min-height:100vh;
+    background:
+      radial-gradient(circle at 15% 0%, rgba(245,165,36,0.08), transparent 40%),
+      radial-gradient(circle at 85% 100%, rgba(45,212,191,0.06), transparent 40%),
+      repeating-linear-gradient(0deg, var(--bg-grid) 0px, var(--bg-grid) 1px, transparent 1px, transparent 32px),
+      repeating-linear-gradient(90deg, var(--bg-grid) 0px, var(--bg-grid) 1px, transparent 1px, transparent 32px),
+      var(--bg);
+    color: var(--ink);
+    font-family: 'Inter', sans-serif;
+    display:flex;
+    justify-content:center;
+    padding: 40px 16px 80px;
+  }
+  .wrap{ width:100%; max-width: 560px; }
+
+  .eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    color: var(--amber);
+    text-transform: uppercase;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-bottom: 10px;
+  }
+  .eyebrow::before{
+    content:"";
+    width:7px; height:7px; border-radius:50%;
+    background: var(--amber);
+    box-shadow: 0 0 8px var(--amber);
+    display:inline-block;
+  }
+  h1{
+    font-family:'Space Grotesk', sans-serif;
+    font-size: clamp(28px, 5vw, 36px);
+    line-height: 1.15;
+    margin: 0 0 8px;
+    font-weight: 700;
+  }
+  .lede{
+    color: var(--ink-dim);
+    font-size: 14.5px;
+    line-height: 1.6;
+    margin: 0 0 28px;
+    max-width: 46ch;
+  }
+
+  /* Ticket card */
+  .ticket{
+    background: var(--card);
+    border: 1px solid var(--card-edge);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: 0 30px 60px -30px rgba(0,0,0,0.7);
+  }
+  .ticket-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding: 18px 22px;
+    background: linear-gradient(180deg, rgba(245,165,36,0.07), transparent);
+  }
+  .ticket-id{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--ink-dim);
+  }
+  .ticket-id b{ color: var(--amber); font-weight: 600; }
+  .ticket-status{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--teal);
+    border: 1px solid rgba(45,212,191,0.35);
+    background: rgba(45,212,191,0.08);
+    padding: 4px 10px;
+    border-radius: 100px;
+  }
+
+  /* perforation divider */
+  .perf{
+    position: relative;
+    height: 0;
+    border-top: 1.5px dashed var(--card-edge);
+    margin: 0 0;
+  }
+  .perf::before, .perf::after{
+    content:"";
+    position:absolute; top:-9px;
+    width:18px; height:18px;
+    background: var(--bg);
+    border: 1px solid var(--card-edge);
+    border-radius: 50%;
+  }
+  .perf::before{ left:-9px; }
+  .perf::after{ right:-9px; }
+
+  form{ padding: 26px 22px 22px; }
+
+  .field{ margin-bottom: 18px; }
+  .field label{
+    display:block;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--ink-dim);
+    margin-bottom: 7px;
+    letter-spacing: 0.01em;
+  }
+  .field label .req{ color: var(--amber); margin-left: 3px; }
+
+  .row2{ display:grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+  input, select, textarea{
+    width:100%;
+    background: #0D1220;
+    border: 1px solid var(--card-edge);
+    color: var(--ink);
+    font-family: 'Inter', sans-serif;
+    font-size: 14.5px;
+    padding: 12px 13px;
+    border-radius: 9px;
+    outline: none;
+    transition: border-color .15s ease, box-shadow .15s ease;
+    appearance: none;
+  }
+  select{
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='9' viewBox='0 0 14 9'><path d='M1 1l6 6 6-6' stroke='%238A93A8' stroke-width='1.6' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 13px center;
+    padding-right: 34px;
+  }
+  textarea{ resize: vertical; min-height: 96px; line-height: 1.5; }
+  input:focus, select:focus, textarea:focus{
+    border-color: var(--amber);
+    box-shadow: 0 0 0 3px rgba(245,165,36,0.15);
+  }
+  input::placeholder, textarea::placeholder{ color: #4B5468; }
+
+  button{
+    width:100%;
+    background: var(--amber);
+    color: #241503;
+    font-family:'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    border: none;
+    padding: 14px 16px;
+    border-radius: 9px;
+    cursor: pointer;
+    transition: transform .1s ease, background .15s ease;
+    display:flex; align-items:center; justify-content:center; gap:8px;
+  }
+  button:hover{ background:#ffb541; }
+  button:active{ transform: scale(0.98); }
+  button:disabled{ opacity:0.6; cursor:progress; }
+
+  .note{
+    font-size: 12px;
+    color: var(--ink-dim);
+    text-align:center;
+    margin-top: 12px;
+    line-height:1.5;
+  }
+
+  .msg{
+    display:none;
+    margin-top: 16px;
+    padding: 12px 14px;
+    border-radius: 9px;
+    font-size: 13.5px;
+    font-family: 'JetBrains Mono', monospace;
+    line-height: 1.5;
+  }
+  .msg.ok{
+    display:block;
+    background: rgba(45,212,191,0.08);
+    border: 1px solid rgba(45,212,191,0.35);
+    color: var(--teal);
+  }
+  .msg.err{
+    display:block;
+    background: rgba(241,101,101,0.08);
+    border: 1px solid rgba(241,101,101,0.35);
+    color: var(--danger);
+  }
+
+  @media (max-width: 480px){
+    .row2{ grid-template-columns: 1fr; }
+  }
+
+  /* Honeypot: invisible to real users, catches simple bots */
+  .hp-field{
+    position: absolute;
+    left: -9999px;
+    top: -9999px;
+    opacity: 0;
+    height: 0;
+    pointer-events: none;
+  }
+
+  .msg.wait{
+    display:block;
+    background: rgba(245,165,36,0.08);
+    border: 1px solid rgba(245,165,36,0.35);
+    color: var(--amber);
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">SIH · On-ground helpdesk</div>
+  <h1>Raise a complaint</h1>
+  <p class="lede">Log an issue during the hackathon and it's queued straight to the organising desk — no chasing volunteers across the floor.</p>
+
+  <div class="ticket">
+    <div class="ticket-head">
+      <div class="ticket-id">Ticket <b id="ticketPreview">SIH-••••</b></div>
+      <div class="ticket-status">Open</div>
+    </div>
+    <div class="perf"></div>
+
+    <form id="complaintForm">
+      <div class="hp-field" aria-hidden="true">
+        <label for="website">Leave this field empty</label>
+        <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="teamName">Team name<span class="req">*</span></label>
+          <input type="text" id="teamName" name="teamName" placeholder="e.g. CodeCrafters" required>
+        </div>
+        <div class="field">
+          <label for="teamNo">Team number<span class="req">*</span></label>
+          <input type="text" id="teamNo" name="teamNo" placeholder="e.g. SIH1234" required>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="category">Category<span class="req">*</span></label>
+        <select id="category" name="category" required>
+          <option value="" disabled selected>Select an issue category</option>
+          <option>Internet / Wi-Fi</option>
+          <option>Power / Electrical</option>
+          <option>Refreshments</option>
+          <option>Venue</option>
+          <option>Components</option>
+          <option>Other</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="subject">Subject<span class="req">*</span></label>
+        <input type="text" id="subject" name="subject" placeholder="Short summary of the issue" required>
+      </div>
+
+      <div class="field">
+        <label for="issue">Issue details<span class="req">*</span></label>
+        <textarea id="issue" name="issue" placeholder="Describe what's happening — the more specific, the faster it gets fixed." required></textarea>
+      </div>
+
+      <div class="field">
+        <label for="venue">Venue<span class="req">*</span></label>
+        <input type="text" id="venue" name="venue" placeholder="e.g. Hall B, Table 14" required>
+      </div>
+
+      <button type="submit" id="submitBtn">Submit complaint →</button>
+      <div class="msg" id="formMsg"></div>
+      <p class="note">Your complaint is logged with a timestamp and routed to the SIH helpdesk team for resolution.<br>
+      Already submitted one? <a href="track.html" style="color: var(--amber);">Track its status →</a></p>
+    </form>
+  </div>
+</div>
+
+<script>
+  // ⚠️ Replace this with your deployed Google Apps Script Web App URL
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw3Dg0oUPQBY0F79k4MorMIoVwu-tjJSMksZiE53-AyGEp4efAIxZPdXtupuN92Hpbtjw/exec";
+
+  // ⚠️ Must match SHARED_SECRET in apps-script-backend.gs
+  const SHARED_SECRET = "sih2026-internal-eclub";
+
+  const COOLDOWN_MS = 10 * 60 * 1000; // 10 minutes
+  const DEVICE_KEY = 'sih_device_id';
+  const LAST_SUBMIT_KEY = 'sih_last_submit';
+
+  // Persistent per-device ID (survives reloads, tied to this browser/device)
+  function getDeviceId() {
+    let id = localStorage.getItem(DEVICE_KEY);
+    if (!id) {
+      if (!window.crypto || !window.crypto.getRandomValues) {
+        throw new Error('Secure random number generation is not available in this browser.');
+      }
+
+      const bytes = new Uint8Array(16);
+      window.crypto.getRandomValues(bytes);
+      id = Array.from(bytes, (byte) => byte.toString(16).padStart(2, '0')).join('');
+      localStorage.setItem(DEVICE_KEY, id);
+    }
+    return id;
+  }
+
+  function msRemainingInCooldown() {
+    const last = Number.parseInt(localStorage.getItem(LAST_SUBMIT_KEY) || '0', 10);
+    const elapsed = Date.now() - last;
+    return Math.max(0, COOLDOWN_MS - elapsed);
+  }
+
+  function formatMinSec(ms) {
+    const totalSec = Math.ceil(ms / 1000);
+    const m = Math.floor(totalSec / 60);
+    const s = totalSec % 60;
+    return `${m}m ${s.toString().padStart(2,'0')}s`;
+  }
+
+  // Cosmetic live ticket-id preview (actual ID / timestamp is assigned by the sheet)
+  const teamNoInput = document.getElementById('teamNo');
+  const ticketPreview = document.getElementById('ticketPreview');
+  teamNoInput.addEventListener('input', () => {
+    const v = teamNoInput.value.trim();
+    ticketPreview.textContent = v ? `SIH-${v.replace(/\s+/g,'').toUpperCase()}` : 'SIH-••••';
+  });
+
+  const form = document.getElementById('complaintForm');
+  const btn = document.getElementById('submitBtn');
+  const msg = document.getElementById('formMsg');
+  const originalBtnText = 'Submit complaint →';
+
+  let cooldownTimer = null;
+
+  function refreshCooldownUI() {
+    const remaining = msRemainingInCooldown();
+    if (remaining > 0) {
+      btn.disabled = true;
+      btn.textContent = `Wait ${formatMinSec(remaining)}`;
+      msg.className = 'msg wait';
+      msg.textContent = `You can submit another complaint from this device in ${formatMinSec(remaining)}. This limit helps stop duplicate/spam tickets.`;
+      if (!cooldownTimer) {
+        cooldownTimer = setInterval(() => {
+          if (msRemainingInCooldown() <= 0) {
+            clearInterval(cooldownTimer);
+            cooldownTimer = null;
+            btn.disabled = false;
+            btn.textContent = originalBtnText;
+            msg.className = 'msg';
+            msg.textContent = '';
+          } else {
+            refreshCooldownUI();
+          }
+        }, 1000);
+      }
+      return true;
+    }
+    return false;
+  }
+
+  // Check cooldown state on page load
+  refreshCooldownUI();
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    if (refreshCooldownUI()) return; // still cooling down
+
+    msg.className = 'msg';
+    msg.textContent = '';
+
+    if (SCRIPT_URL.includes('PASTE_YOUR')) {
+      msg.className = 'msg err';
+      msg.textContent = 'Setup needed: add your Google Apps Script Web App URL in index.html (SCRIPT_URL).';
+      return;
+    }
+
+    // Honeypot check — if this hidden field got filled, it's almost certainly a bot
+    const honeypot = document.getElementById('website').value;
+    if (honeypot) {
+      // Pretend it worked so bots don't learn to avoid this field
+      msg.className = 'msg ok';
+      msg.textContent = `Logged ✓ Ticket ${ticketPreview.textContent} has been sent to the helpdesk.`;
+      form.reset();
+      ticketPreview.textContent = 'SIH-••••';
+      return;
+    }
+
+    const data = {
+      secret: SHARED_SECRET,
+      deviceId: getDeviceId(),
+      teamName: document.getElementById('teamName').value.trim(),
+      teamNo: document.getElementById('teamNo').value.trim(),
+      category: document.getElementById('category').value,
+      subject: document.getElementById('subject').value.trim(),
+      issue: document.getElementById('issue').value.trim(),
+      venue: document.getElementById('venue').value.trim(),
+    };
+
+    btn.disabled = true;
+    btn.textContent = 'Submitting…';
+
+    try {
+      const res = await fetch(SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // keeps this a "simple request" (no CORS preflight)
+        body: JSON.stringify(data)
+      });
+      const result = await res.json();
+
+      if (result.result === 'success') {
+        localStorage.setItem(LAST_SUBMIT_KEY, Date.now().toString());
+        localStorage.setItem('sih_last_ticket', result.ticketId);
+        localStorage.setItem('sih_last_teamno', data.teamNo);
+
+        msg.className = 'msg ok';
+        msg.textContent = `Logged ✓ Your ticket ID is ${result.ticketId} — save this along with your Team Number to track its status later.`;
+        form.reset();
+        ticketPreview.textContent = 'SIH-••••';
+        refreshCooldownUI();
+      } else if (result.result === 'cooldown') {
+        msg.className = 'msg wait';
+        msg.textContent = 'This device recently submitted a complaint. Please wait for the cooldown to finish.';
+        btn.disabled = false;
+        btn.textContent = originalBtnText;
+      } else {
+        msg.className = 'msg err';
+        msg.textContent = 'Submission was rejected by the server. Please try again.';
+        btn.disabled = false;
+        btn.textContent = originalBtnText;
+      }
+    } catch (err) {
+      console.error('Submission error:', err);
+      msg.className = 'msg err';
+      msg.textContent = 'Could not submit — check your connection and try again.';
+      btn.disabled = false;
+      btn.textContent = originalBtnText;
+    }
+  });
+</script>
+</body>
+</html>

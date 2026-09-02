@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Track Complaint — SIH Helpdesk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://script.google.com/macros/s/AKfycbw3Dg0oUPQBY0F79k4MorMIoVwu-tjJSMksZiE53-AyGEp4efAIxZPdXtupuN92Hpbtjw/exec" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0B0F1A;
+    --bg-grid: #131a2b;
+    --card: #121826;
+    --card-edge: #1E2740;
+    --ink: #EDEFF5;
+    --ink-dim: #8A93A8;
+    --amber: #F5A524;
+    --teal: #2DD4BF;
+    --danger: #F16565;
+    --radius: 14px;
+  }
+  *{ box-sizing: border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    min-height:100vh;
+    background:
+      radial-gradient(circle at 15% 0%, rgba(245,165,36,0.08), transparent 40%),
+      radial-gradient(circle at 85% 100%, rgba(45,212,191,0.06), transparent 40%),
+      repeating-linear-gradient(0deg, var(--bg-grid) 0px, var(--bg-grid) 1px, transparent 1px, transparent 32px),
+      repeating-linear-gradient(90deg, var(--bg-grid) 0px, var(--bg-grid) 1px, transparent 1px, transparent 32px),
+      var(--bg);
+    color: var(--ink);
+    font-family: 'Inter', sans-serif;
+    display:flex;
+    justify-content:center;
+    padding: 40px 16px 80px;
+  }
+  .wrap{ width:100%; max-width: 560px; }
+  .eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    color: var(--amber);
+    text-transform: uppercase;
+    display:flex; align-items:center; gap:8px;
+    margin-bottom: 10px;
+  }
+  .eyebrow::before{
+    content:""; width:7px; height:7px; border-radius:50%;
+    background: var(--amber); box-shadow: 0 0 8px var(--amber); display:inline-block;
+  }
+  h1{
+    font-family:'Space Grotesk', sans-serif;
+    font-size: clamp(28px, 5vw, 36px);
+    line-height: 1.15; margin: 0 0 8px; font-weight: 700;
+  }
+  .lede{ color: var(--ink-dim); font-size: 14.5px; line-height: 1.6; margin: 0 0 28px; max-width: 46ch; }
+  .backlink{ color: var(--ink-dim); font-size: 13px; text-decoration:none; }
+  .backlink:hover{ color: var(--amber); }
+
+  .card{
+    background: var(--card);
+    border: 1px solid var(--card-edge);
+    border-radius: var(--radius);
+    padding: 22px;
+    box-shadow: 0 30px 60px -30px rgba(0,0,0,0.7);
+    margin-top: 20px;
+  }
+  .field{ margin-bottom: 16px; }
+  .field label{
+    display:block; font-size: 12.5px; font-weight: 600; color: var(--ink-dim);
+    margin-bottom: 7px;
+  }
+  input, select{
+    width:100%;
+    background: #0D1220;
+    border: 1px solid var(--card-edge);
+    color: var(--ink);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14.5px;
+    padding: 12px 13px;
+    border-radius: 9px;
+    outline: none;
+    text-transform: uppercase;
+  }
+  input:focus{ border-color: var(--amber); box-shadow: 0 0 0 3px rgba(245,165,36,0.15); }
+  input::placeholder{ color: #4B5468; text-transform: none; }
+
+  button{
+    width:100%;
+    background: var(--amber);
+    color: #241503;
+    font-family:'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    border: none;
+    padding: 14px 16px;
+    border-radius: 9px;
+    cursor: pointer;
+  }
+  button:hover{ background:#ffb541; }
+  button:disabled{ opacity:0.6; cursor:progress; }
+
+  .msg{
+    margin-top: 14px;
+    padding: 12px 14px;
+    border-radius: 9px;
+    font-size: 13.5px;
+    font-family: 'JetBrains Mono', monospace;
+    line-height: 1.5;
+    display:none;
+  }
+  .msg.err{ display:block; background: rgba(241,101,101,0.08); border: 1px solid rgba(241,101,101,0.35); color: var(--danger); }
+
+  /* Result panel */
+  .result{ display:none; margin-top: 22px; }
+  .result.show{ display:block; }
+
+  .status-row{ display:flex; align-items:center; gap:12px; margin-bottom: 22px; }
+  .status-pill{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 6px 14px;
+    border-radius: 100px;
+    font-weight: 600;
+  }
+  .status-pill.pending{ background: rgba(139,148,168,0.12); border: 1px solid rgba(139,148,168,0.35); color: var(--ink-dim); }
+  .status-pill.ongoing{ background: rgba(245,165,36,0.1); border: 1px solid rgba(245,165,36,0.4); color: var(--amber); }
+  .status-pill.solved{ background: rgba(45,212,191,0.1); border: 1px solid rgba(45,212,191,0.4); color: var(--teal); }
+
+  .steps{ display:flex; align-items:center; gap:6px; margin-bottom: 24px; }
+  .step{ flex:1; text-align:center; }
+  .dot{
+    width: 24px; height:24px; border-radius:50%;
+    background: #1A2136; border: 2px solid var(--card-edge);
+    display:flex; align-items:center; justify-content:center;
+    margin: 0 auto 8px;
+    font-family:'JetBrains Mono', monospace; font-size: 11px; color: var(--ink-dim);
+  }
+  .step.done .dot{ background: var(--teal); border-color: var(--teal); color: #06231F; }
+  .step.active .dot{ background: var(--amber); border-color: var(--amber); color: #241503; }
+  .step-label{ font-size: 11px; color: var(--ink-dim); font-family:'JetBrains Mono', monospace; text-transform: uppercase; letter-spacing: 0.04em; }
+  .step.done .step-label, .step.active .step-label{ color: var(--ink); }
+  .step-line{ flex: 0.6; height: 2px; background: var(--card-edge); margin-bottom: 24px; }
+  .step-line.done{ background: var(--teal); }
+
+  .detail{ font-size: 13.5px; color: var(--ink-dim); line-height: 1.7; }
+  .detail b{ color: var(--ink); font-weight: 600; }
+  .remarks-box{
+    margin-top: 16px;
+    background: #0D1220;
+    border: 1px solid var(--card-edge);
+    border-radius: 9px;
+    padding: 14px;
+    font-size: 13.5px;
+    line-height: 1.6;
+  }
+  .remarks-box .label{
+    font-family:'JetBrains Mono', monospace; font-size: 11px; text-transform: uppercase;
+    color: var(--ink-dim); letter-spacing: 0.06em; margin-bottom: 6px; display:block;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">SIH · On-ground helpdesk</div>
+  <h1>Track your complaint</h1>
+  <p class="lede">Enter your Ticket ID and Team Number to check the current status.</p>
+  <a class="backlink" href="index.html">← Back to complaint form</a>
+
+  <div class="card">
+    <form id="trackForm">
+      <div class="field">
+        <label for="ticketId">Ticket ID</label>
+        <input type="text" id="ticketId" placeholder="SIH-0001" required>
+      </div>
+      <div class="field">
+        <label for="teamNo">Team number</label>
+        <input type="text" id="teamNo" placeholder="e.g. SIH1234" required>
+      </div>
+      <button type="submit" id="trackBtn">Check status →</button>
+      <div class="msg" id="trackMsg"></div>
+    </form>
+
+    <div class="result" id="result">
+      <div class="status-row">
+        <span class="status-pill" id="statusPill">—</span>
+      </div>
+
+      <div class="steps" id="steps">
+        <div class="step" id="stepPending">
+          <div class="dot">1</div>
+          <div class="step-label">Pending</div>
+        </div>
+        <div class="step-line" id="line1"></div>
+        <div class="step" id="stepOngoing">
+          <div class="dot">2</div>
+          <div class="step-label">Ongoing</div>
+        </div>
+        <div class="step-line" id="line2"></div>
+        <div class="step" id="stepSolved">
+          <div class="dot">3</div>
+          <div class="step-label">Solved</div>
+        </div>
+      </div>
+
+      <div class="detail">
+        <div><b id="dSubject"></b></div>
+        <div id="dMeta" style="margin-top:4px;"></div>
+      </div>
+
+      <div class="remarks-box" id="remarksBox" style="display:none;">
+        <span class="label">Admin remarks</span>
+        <span id="dRemarks"></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ⚠️ Replace this with your deployed Google Apps Script Web App URL
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw3Dg0oUPQBY0F79k4MorMIoVwu-tjJSMksZiE53-AyGEp4efAIxZPdXtupuN92Hpbtjw/exec";
+
+  const form = document.getElementById('trackForm');
+  const btn = document.getElementById('trackBtn');
+  const msg = document.getElementById('trackMsg');
+  const result = document.getElementById('result');
+
+  // Pre-fill from the last successful submission on this device, if any
+  window.addEventListener('DOMContentLoaded', () => {
+    const lastTicket = localStorage.getItem('sih_last_ticket');
+    const lastTeamNo = localStorage.getItem('sih_last_teamno');
+    if (lastTicket) document.getElementById('ticketId').value = lastTicket;
+    if (lastTeamNo) document.getElementById('teamNo').value = lastTeamNo;
+  });
+
+  function setStep(status) {
+    const order = ['pending', 'ongoing', 'solved'];
+    const idx = order.indexOf((status || '').toLowerCase());
+
+    ['stepPending','stepOngoing','stepSolved'].forEach((id, i) => {
+      const el = document.getElementById(id);
+      el.classList.remove('done','active');
+      if (i < idx) el.classList.add('done');
+      else if (i === idx) el.classList.add('active');
+    });
+    document.getElementById('line1').classList.toggle('done', idx >= 1);
+    document.getElementById('line2').classList.toggle('done', idx >= 2);
+
+    const pill = document.getElementById('statusPill');
+    pill.className = 'status-pill ' + (order[idx] || 'pending');
+    pill.textContent = status || 'Pending';
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    msg.className = 'msg';
+    msg.textContent = '';
+    result.classList.remove('show');
+
+    if (SCRIPT_URL.includes('PASTE_YOUR')) {
+      msg.className = 'msg err';
+      msg.textContent = 'Setup needed: add your Google Apps Script Web App URL in track.html (SCRIPT_URL).';
+      return;
+    }
+
+    const ticketId = document.getElementById('ticketId').value.trim();
+    const teamNo = document.getElementById('teamNo').value.trim();
+
+    btn.disabled = true;
+    btn.textContent = 'Checking…';
+
+    try {
+      const url = `${SCRIPT_URL}?action=status&ticketId=${encodeURIComponent(ticketId)}&teamNo=${encodeURIComponent(teamNo)}`;
+      const res = await fetch(url);
+      const data = await res.json();
+
+      if (!data.found) {
+        msg.className = 'msg err';
+        msg.textContent = "No complaint found with that Ticket ID and Team Number. Double-check both and try again.";
+        return;
+      }
+
+      setStep(data.status);
+      document.getElementById('dSubject').textContent = data.subject || '';
+      document.getElementById('dMeta').textContent = `${data.category} · ${data.venue} · Team ${data.teamName}`;
+
+      const remarksBox = document.getElementById('remarksBox');
+      if (data.remarks) {
+        remarksBox.style.display = 'block';
+        document.getElementById('dRemarks').textContent = data.remarks;
+      } else {
+        remarksBox.style.display = 'none';
+      }
+
+      result.classList.add('show');
+    } 
+    catch (err) {
+      console.error('Status check error:', err);
+      msg.className = 'msg err';
+      msg.textContent = 'Could not check status — check your connection and try again.';
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Check status →';
+    }
+  });
+</script>
+</body>
+</html>
