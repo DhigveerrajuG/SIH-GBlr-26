@@ -257,8 +257,8 @@
           <input type="text" id="teamName" name="teamName" placeholder="e.g. CodeCrafters" required>
         </div>
         <div class="field">
-          <label for="teamNo">Team number<span class="req">*</span></label>
-          <input type="text" id="teamNo" name="teamNo" placeholder="e.g. SIH1234" required>
+          <label for="tablenumber">Table number<span class="req">*</span></label>
+          <input type="text" id="tablenumber" name="tablenumber" placeholder="e.g. SIH1234" required>
         </div>
       </div>
 
@@ -268,9 +268,8 @@
           <option value="" disabled selected>Select an issue category</option>
           <option>Internet / Wi-Fi</option>
           <option>Power / Electrical</option>
-          <option>Refreshments</option>
-          <option>Venue</option>
-          <option>Components</option>
+          <option>Tech Support</option>
+          <option>Hardware Components</option>
           <option>Other</option>
         </select>
       </div>
@@ -339,10 +338,10 @@
   }
 
   // Cosmetic live ticket-id preview (actual ID / timestamp is assigned by the sheet)
-  const teamNoInput = document.getElementById('teamNo');
+  const tablenumberInput = document.getElementById('tablenumber');
   const ticketPreview = document.getElementById('ticketPreview');
-  teamNoInput.addEventListener('input', () => {
-    const v = teamNoInput.value.trim();
+  tablenumberInput.addEventListener('input', () => {
+    const v = tablenumberInput.value.trim();
     ticketPreview.textContent = v ? `SIH-${v.replace(/\s+/g,'').toUpperCase()}` : 'SIH-••••';
   });
 
@@ -411,7 +410,7 @@
       secret: SHARED_SECRET,
       deviceId: getDeviceId(),
       teamName: document.getElementById('teamName').value.trim(),
-      teamNo: document.getElementById('teamNo').value.trim(),
+      tablenumber: document.getElementById('tablenumber').value.trim(),
       category: document.getElementById('category').value,
       subject: document.getElementById('subject').value.trim(),
       issue: document.getElementById('issue').value.trim(),
@@ -432,10 +431,10 @@
       if (result.result === 'success') {
         localStorage.setItem(LAST_SUBMIT_KEY, Date.now().toString());
         localStorage.setItem('sih_last_ticket', result.ticketId);
-        localStorage.setItem('sih_last_teamno', data.teamNo);
+        localStorage.setItem('sih_last_tablenumber', data.tablenumber);
 
         msg.className = 'msg ok';
-        msg.textContent = `Logged ✓ Your ticket ID is ${result.ticketId} — save this along with your Team Number to track its status later.`;
+        msg.textContent = `Logged ✓ Your ticket ID is ${result.ticketId} — save this along with your Table Number to track its status later.`;
         form.reset();
         ticketPreview.textContent = 'SIH-••••';
         refreshCooldownUI();

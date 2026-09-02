@@ -379,7 +379,7 @@
 
     let filtered = complaints.filter(c => {
       const statusMatch = currentFilter === 'all' || (c.status || '').toLowerCase() === currentFilter;
-      const searchMatch = !q || [c.teamName, c.teamNo, c.ticketId, c.venue, c.subject]
+      const searchMatch = !q || [c.teamName, c.tablenumber, c.ticketId, c.venue, c.subject]
         .join(' ').toLowerCase().includes(q);
       return statusMatch && searchMatch;
     });
@@ -394,7 +394,7 @@
         <span class="t-id">${c.ticketId}</span>
         <div class="t-main">
           <div class="t-subject">${escapeHtml(c.subject)}</div>
-          <div class="t-meta">${escapeHtml(c.teamName)} (${escapeHtml(c.teamNo)}) · ${escapeHtml(c.category)} · ${escapeHtml(c.venue)}</div>
+          <div class="t-meta">${escapeHtml(c.teamName)} (${escapeHtml(c.tablenumber)}) · ${escapeHtml(c.category)} · ${escapeHtml(c.venue)}</div>
         </div>
         <span class="t-pill ${(c.status||'').toLowerCase()}">${c.status || 'Pending'}</span>
       </div>
@@ -419,7 +419,7 @@
 
     document.getElementById('mTicketId').textContent = c.ticketId;
     document.getElementById('mSubject').textContent = c.subject;
-    document.getElementById('mTeam').innerHTML = `Team <b>${escapeHtml(c.teamName)}</b> · ${escapeHtml(c.teamNo)}`;
+    document.getElementById('mTeam').innerHTML = `Team <b>${escapeHtml(c.teamName)}</b> · ${escapeHtml(c.tablenumber)}`;
     document.getElementById('mCategory').textContent = c.category;
     document.getElementById('mVenue').textContent = c.venue;
     document.getElementById('mTime').textContent = `Submitted: ${c.timestamp}`;
