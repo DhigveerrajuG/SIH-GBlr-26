@@ -63,6 +63,19 @@
     margin: 0 0 8px;
     font-weight: 700;
   }
+  .title-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:18px;
+  }
+  .title-row h1{ margin:0; }
+  .venue-logo{
+    width:138px;
+    height:68px;
+    display:block;
+    flex:0 0 auto;
+  }
   .lead{
     color: var(--ink-dim);
     font-family: 'Inter', sans-serif;
@@ -236,12 +249,29 @@
     border: 1px solid rgba(245,165,36,0.35);
     color: var(--amber);
   }
+  @media (max-width: 480px){
+    .title-row{ align-items:flex-start; gap:12px; }
+    .venue-logo{ width:108px; height:54px; }
+  }
 </style>
 </head>
 <body>
 <div class="wrap">
   <div class="eyebrow">SIH · On-ground helpdesk</div>
-  <h1>Raise a complaint</h1>
+  <div class="title-row">
+    <h1>Raise a complaint</h1>
+    <svg class="venue-logo" role="img" aria-label="Venture Development Centre" viewBox="0 0 720 360" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <filter id="vdcGreen" color-interpolation-filters="sRGB">
+          <feColorMatrix type="matrix" values="0 0 0 0 0  0 0 0 0 0.45  0 0 0 0 0.40  0.2126 0.7152 0.0722 0 0" />
+          <feComponentTransfer>
+            <feFuncA type="linear" slope="2.2" intercept="-0.1" />
+          </feComponentTransfer>
+        </filter>
+      </defs>
+      <image href="images/WhatsApp Image 2026-09-03 at 6.16.22 PM.jpeg" width="720" height="360" preserveAspectRatio="xMidYMid meet" filter="url(#vdcGreen)" />
+    </svg>
+  </div>
   <p class="lead">Participants can report issues through this web portal, which are directly sent to the organizing team for quick resolution.</p>
 
   <div class="ticket">
