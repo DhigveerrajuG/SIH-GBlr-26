@@ -27,13 +27,17 @@
   /* Login */
   #loginScreen{ min-height:100vh; display:flex; align-items:center; justify-content:center; padding:20px; }
   .login-card{
-    background: var(--card); border: 1px solid var(--card-edge); border-radius: var(--radius);
+    background-color: var(--card);
+    background-image: linear-gradient(rgba(255,255,255,0.52), rgba(255,255,255,0.68)), url('images/sih_image-CtCyz0b-.jpg.jpeg');
+    background-size: cover;
+    background-position: center;
+    border: 1px solid var(--card-edge); border-radius: var(--radius);
     padding: 28px; width:100%; max-width: 360px; box-shadow: 0 30px 60px -30px rgba(0,0,0,0.7);
   }
   .login-card h1{ font-family:'Space Grotesk', sans-serif; font-size: 22px; margin: 0 0 6px; }
   .login-card p{ color: var(--ink-dim); font-size: 13.5px; margin: 0 0 20px; }
   .login-card input{
-    width:100%; background:#0D1220; border:1px solid var(--card-edge); color:var(--ink);
+    width:100%; background:#FFFFFF; border:1px solid var(--card-edge); color:var(--ink);
     font-family:'JetBrains Mono', monospace; font-size: 14px; padding: 12px 13px; border-radius: 9px;
     outline:none; margin-bottom: 14px;
   }
@@ -76,7 +80,7 @@
   .filter-btn.active{ border-color: var(--amber); color: var(--amber); background: rgba(245,165,36,0.08); }
 
   .search input{
-    width:100%; background: var(--card); border:1px solid var(--card-edge); color: var(--ink);
+    width:100%; background: #FFFFFF; border:1px solid var(--card-edge); color: var(--ink);
     font-family:'Inter', sans-serif; font-size: 13.5px; padding: 11px 14px; border-radius: 9px; outline:none;
     margin-bottom: 18px;
   }
@@ -86,7 +90,11 @@
   .empty{ color: var(--ink-dim); font-size: 13.5px; padding: 30px 0; text-align:center; font-family:'JetBrains Mono', monospace; }
 
   .ticket-row{
-    background: var(--card); border: 1px solid var(--card-edge); border-radius: 12px;
+    background-color: var(--card);
+    background-image: linear-gradient(rgba(255,255,255,0.52), rgba(255,255,255,0.68)), url('images/sih_image-CtCyz0b-.jpg.jpeg');
+    background-size: cover;
+    background-position: center;
+    border: 1px solid var(--card-edge); border-radius: 12px;
     padding: 14px 16px; cursor:pointer; transition: border-color .15s ease;
     display:flex; align-items:center; gap:14px; flex-wrap:wrap;
   }
@@ -109,7 +117,11 @@
     align-items:center; justify-content:center; padding: 20px; z-index: 50;
   }
   .modal{
-    background: var(--card); border: 1px solid var(--card-edge); border-radius: var(--radius);
+    background-color: var(--card);
+    background-image: linear-gradient(rgba(255,255,255,0.52), rgba(255,255,255,0.68)), url('images/sih_image-CtCyz0b-.jpg.jpeg');
+    background-size: cover;
+    background-position: center;
+    border: 1px solid var(--card-edge); border-radius: var(--radius);
     width:100%; max-width: 480px; max-height: 88vh; overflow-y:auto;
     box-shadow: 0 30px 60px -20px rgba(0,0,0,0.8);
   }
@@ -128,7 +140,7 @@
     text-transform:uppercase; letter-spacing:0.04em; font-family:'JetBrains Mono', monospace;
   }
   .modal-body textarea, .modal-body input[type=text]{
-    width:100%; background:#0D1220; border:1px solid var(--card-edge); color:var(--ink);
+    width:100%; background:#FFFFFF; border:1px solid var(--card-edge); color:var(--ink);
     font-family:'Inter', sans-serif; font-size: 13.5px; padding: 11px; border-radius:9px;
     outline:none; resize:vertical;
   }
