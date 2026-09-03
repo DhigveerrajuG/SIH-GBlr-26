@@ -54,6 +54,9 @@
     font-size: clamp(28px, 5vw, 36px);
     line-height: 1.15; margin: 0 0 8px; font-weight: 700;
   }
+  .title-row{ display:flex; align-items:center; justify-content:space-between; gap:18px; }
+  .title-row h1{ margin:0; }
+  .venue-logo{ width:138px; height:68px; display:block; flex:0 0 auto; }
   .intro{ color: var(--ink-dim); font-size: 14.5px; line-height: 1.6; margin: 0 0 28px; max-width: 46ch; }
   .back-link{
     color: var(--ink-dim);
@@ -174,7 +177,20 @@
 <body>
 <div class="wrap">
   <div class="eyebrow">SIH · On-ground helpdesk</div>
-  <h1>Track your complaint</h1>
+  <div class="title-row">
+    <h1>Track your complaint</h1>
+    <svg class="venue-logo" role="img" aria-label="Venture Development Centre" viewBox="0 0 720 360" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <filter id="trackVdcGreen" color-interpolation-filters="sRGB">
+          <feColorMatrix type="matrix" values="0 0 0 0 0  0 0 0 0 0.45  0 0 0 0 0.40  0.2126 0.7152 0.0722 0 0" />
+          <feComponentTransfer>
+            <feFuncA type="linear" slope="2.2" intercept="-0.1" />
+          </feComponentTransfer>
+        </filter>
+      </defs>
+      <image href="images/WhatsApp Image 2026-09-03 at 6.16.22 PM.jpeg" width="720" height="360" preserveAspectRatio="xMidYMid meet" filter="url(#trackVdcGreen)" />
+    </svg>
+  </div>
   <p class="intro">Enter your Ticket ID and Team Number to check the current status.</p>
   <a class="back-link" href="index.html">← Back to complaint form</a>
 

@@ -35,6 +35,9 @@
     padding: 28px; width:100%; max-width: 360px; box-shadow: 0 30px 60px -30px rgba(0,0,0,0.7);
   }
   .login-card h1{ font-family:'Space Grotesk', sans-serif; font-size: 22px; margin: 0 0 6px; }
+  .admin-title{ display:flex; align-items:center; justify-content:space-between; gap:12px; }
+  .admin-title h1{ margin:0; }
+  .venue-logo{ width:108px; height:54px; display:block; flex:0 0 auto; }
   .login-card p{ color: var(--ink-dim); font-size: 13.5px; margin: 0 0 20px; }
   .login-card input{
     width:100%; background:#FFFFFF; border:1px solid var(--card-edge); color:var(--ink);
@@ -201,7 +204,20 @@
 <!-- Login -->
 <div id="loginScreen">
   <div class="login-card">
-    <h1>Admin access</h1>
+    <div class="admin-title">
+      <h1>Admin access</h1>
+      <svg class="venue-logo" role="img" aria-label="Venture Development Centre" viewBox="0 0 720 360" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <filter id="adminVdcGreen" color-interpolation-filters="sRGB">
+            <feColorMatrix type="matrix" values="0 0 0 0 0  0 0 0 0 0.45  0 0 0 0 0.40  0.2126 0.7152 0.0722 0 0" />
+            <feComponentTransfer>
+              <feFuncA type="linear" slope="2.2" intercept="-0.1" />
+            </feComponentTransfer>
+          </filter>
+        </defs>
+        <image href="images/WhatsApp Image 2026-09-03 at 6.16.22 PM.jpeg" width="720" height="360" preserveAspectRatio="xMidYMid meet" filter="url(#adminVdcGreen)" />
+      </svg>
+    </div>
     <p>Enter your personal admin key to open the SIH support dashboard.</p>
     <label for="adminKey">Admin key</label>
     <input type="password" id="adminKey" placeholder="Your admin key" autocomplete="off">
